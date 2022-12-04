@@ -1,0 +1,11 @@
+---
+version: "3"
+
+tasks:
+  up:
+    cmds:
+      - echo "2 - UP"
+
+  down:
+    cmds:
+      - echo "2 - DOWN"

@@ -1,0 +1,95 @@
+---
+version: "3"
+
+vars:
+  MAIN_PACKAGE: main.go
+  VET_CMD: golangci-lint run
+  UNIT_CMD: ginkgo --randomize-suites -v --race ./...
+  COV_CMD: |
+    result=$(go test -race -coverprofile cover.out ./...)
+    status=$?
+
+    echo "$result"
+
+    if test $status -ne 0; then
+      exit $status
+    fi
+
+    echo "$result" | "$(go env GOPATH)"/bin/go-junit-report > report.xml
+
+tasks:
+  deps:
+    desc: Install dependencies
+    cmds:
+      - go install github.com/onsi/ginkgo/v2/ginkgo@v2.3.1
+      - go install mvdan.cc/gofumpt@latest
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47
+      - go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
+      - go install golang.org/x/vuln/cmd/govulncheck@latest
+      - go install github.com/jstemmer/go-junit-report@v0.9.1
+      - go install github.com/segmentio/golines@latest
+
+  mod:
+    desc: Module maintenance
+    cmds:
+      - go mod download
+      - go mod tidy
+
+  vet:
+    desc: Report likely mistakes in packages
+    cmds:
+      - "{{ .VET_CMD }}"
+
+  vuln:
+    desc: Run Go's vulnerability scanner
+    cmds:
+      - govulncheck ./...
+
+  run:
+    desc: Compile and run Go program
+    cmds:
+      - task: deps
+      - task: mod
+      - go run {{ .MAIN_PACKAGE }}
+
+  unit:
+    desc: Test packages
+    cmds:
+      - task: deps
+      - task: mod
+      - "{{ .UNIT_CMD }}"
+
+  test:
+    desc: Test all
+    cmds:
+      - task: deps
+      - task: mod
+      - task: fmt:check
+      - task: vet
+      - task: cov
+
+  cov:
+    desc: Generate coverage
+    cmds:
+      - task: deps
+      - task: mod
+      - "{{ .COV_CMD }}"
+
+  fmt:
+    desc: Reformat files whose formatting differs from `go_fmt_command`
+    cmds:
+      - gofumpt -l -w .
+      - golines -w .
+
+  fmt:check:
+    desc: Check files whose formatting differs from `go_fmt_command`
+    cmds:
+      - test -z "$(gofumpt -l .)"
+      - test -z "$(golines -l .)"
+
+  doc:generate:
+    desc: Generate markdown documentation for golang code
+    cmds:
+      # NOTE(retr0h): Docs will not render headers correctly.
+      # https://github.com/princjef/gomarkdoc/issues/81
+      - gomarkdoc --output README.md ./...
