@@ -1,5 +1,5 @@
 pkg/migrate/database.db
 database.db
 
-cover.out
+coverage.txt
 report.xml

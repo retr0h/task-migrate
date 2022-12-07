@@ -6,7 +6,8 @@ vars:
   VET_CMD: golangci-lint run
   UNIT_CMD: ginkgo --randomize-suites -v --race ./...
   COV_CMD: |
-    result=$(go test -race -coverprofile cover.out ./...)
+    result=$(go test -v -race -coverprofile coverage.txt -covermode atomic ./...)
+
     status=$?
 
     echo "$result"
@@ -26,7 +27,7 @@ tasks:
       - go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47
       - go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
       - go install golang.org/x/vuln/cmd/govulncheck@latest
-      - go install github.com/jstemmer/go-junit-report@v0.9.1
+      - go install github.com/jstemmer/go-junit-report/v2@latest
       - go install github.com/segmentio/golines@latest
 
   mod:
