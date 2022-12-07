@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -99,7 +98,6 @@ func (m *Migration) Up() error {
 
 // FindMigrations determine planned migrations.
 func (m *Migration) FindMigrations() (*PlannedMigration, error) {
-	var tasks []*Task
 	var lastMigrationVersionID int64
 
 	lastMigrationRecord, err := m.repo.Last()
@@ -113,13 +111,14 @@ func (m *Migration) FindMigrations() (*PlannedMigration, error) {
 		lastMigrationVersionID = lastMigrationRecord.ID
 	}
 
-	files, err := ioutil.ReadDir(m.versionsDir)
+	files, err := os.ReadDir(m.versionsDir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to walk directory: %s %w", m.versionsDir, err)
 	}
 
-	for _, f := range files {
-		versionID, err := strconv.ParseInt(f.Name()[0:1], 10, 64)
+	tasks := make([]*Task, len(files))
+	for i, file := range files {
+		versionID, err := strconv.ParseInt(file.Name()[0:1], 10, 64)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert str to int: %w", err)
 		}
@@ -128,8 +127,9 @@ func (m *Migration) FindMigrations() (*PlannedMigration, error) {
 			continue
 		}
 
-		filePath := filepath.Join(m.versionsDir, f.Name())
-		tasks = append(tasks, NewTask(filePath, m.verbose))
+		filePath := filepath.Join(m.versionsDir, file.Name())
+		tasks[i] = NewTask(filePath, m.verbose)
+
 	}
 
 	return &PlannedMigration{
