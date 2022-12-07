@@ -1,3 +1,5 @@
-
 pkg/migrate/database.db
 database.db
+
+cover.out
+report.xml
