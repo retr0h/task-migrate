@@ -1,4 +1,5 @@
 [![Go](https://github.com/retr0h/task-migrate/actions/workflows/go.yml/badge.svg)](https://github.com/retr0h/task-migrate/actions/workflows/go.yml)
+[![codecov](https://codecov.io/gh/retr0h/task-migrate/branch/main/graph/badge.svg?token=9OYBYGKKJD)](https://codecov.io/gh/retr0h/task-migrate)
 
 # Task Migrate
 
