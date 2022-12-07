@@ -1,3 +1,5 @@
+[![Go](https://github.com/retr0h/task-migrate/actions/workflows/go.yml/badge.svg)](https://github.com/retr0h/task-migrate/actions/workflows/go.yml)
+
 # Task Migrate
 
 A general purpose migration tool built around [Task][] runner,

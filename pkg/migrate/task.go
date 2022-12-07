@@ -9,12 +9,6 @@ import (
 	"github.com/go-task/task/v3/taskfile"
 )
 
-var (
-	output  taskfile.Output
-	listAll bool
-	calls   []taskfile.Call
-)
-
 // Task entrypoint executor.
 type Task struct {
 	entrypoint string
